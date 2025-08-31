@@ -1,0 +1,33 @@
+{
+  "languages": {
+    "en": "English",
+    "es": "Spanish",
+    "fr": "French",
+    "hi": "Hindi",
+    "zh": "Chinese"
+  },
+  "navbar": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "language": "Language"
+  },
+  "chat": {
+    "title": "Chat",
+    "typeMessage": "Type a message...",
+    "send": "Send",
+    "online": "Online",
+    "typing": "typing...",
+    "lastSeen": "Last seen {{time}}",
+    "recently": "recently",
+    "noMessages": "No messages yet",
+    "uploadImage": "Upload image",
+    "replies": {
+      "thanks": "Thanks for your message! 😊",
+      "getBack": "I'll get back to you soon!",
+      "interesting": "That's interesting! Tell me more.",
+      "tomorrow": "Can we continue this tomorrow?"
+    }
+  },
+  "loading": "Loading..."
+}

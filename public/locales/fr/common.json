@@ -1,0 +1,33 @@
+{
+  "navbar": {
+    "home": "Accueil",
+    "about": "À propos",
+    "contact": "Contact",
+    "language": "Langue"
+  },
+  "chat": {
+    "title": "Discussion",
+    "typeMessage": "Tapez un message...",
+    "send": "Envoyer",
+    "online": "En ligne",
+    "typing": "en train d'écrire...",
+    "lastSeen": "Vu dernièrement {{time}}",
+    "recently": "récemment",
+    "noMessages": "Aucun message pour le moment",
+    "uploadImage": "Télécharger une image",
+    "replies": {
+      "thanks": "Merci pour votre message ! 😊",
+      "getBack": "Je vous répondrai bientôt !",
+      "interesting": "C'est intéressant ! Dites-m'en plus.",
+      "tomorrow": "Pouvons-nous continuer demain ?"
+    }
+  },
+  "languages": {
+    "en": "Anglais",
+    "es": "Espagnol",
+    "fr": "Français",
+    "hi": "Hindi",
+    "zh": "Chinois"
+  },
+  "loading": "Chargement..."
+}

@@ -1,0 +1,505 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  username        String   @unique
+  fullName        String?
+  country         String?
+  avatarUrl       String?
+  bio             String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Gamification fields
+  level           Int      @default(1)
+  xp              Int      @default(0)
+  coins           Int      @default(100)
+  gems            Int      @default(10)
+  dailyStreak     Int      @default(0)
+  lastActiveAt    DateTime @default(now())
+  totalSearches   Int      @default(0)
+  totalQuizzes    Int      @default(0)
+  totalInnovations Int     @default(0)
+  
+  // Relationships
+  achievements    UserAchievement[]
+  powerUps        UserPowerUp[]
+  dailyChallenges UserDailyChallenge[]
+  quizAttempts    QuizAttempt[]
+  teamMemberships TeamMember[]
+  inventoryItems  InventoryItem[]
+  createdTeams    Team[]       @relation("TeamLeader")
+  globalMissions  GlobalMissionParticipant[]
+  learningPaths   UserLearningPath[]
+  conversations   ChatConversation[]
+  audioFiles      AudioFile[]
+  researchActivities UserResearchActivity[]
+  leaderboardEntries LeaderboardEntry[]
+  
+  @@map("users")
+}
+
+// Gamification - Achievements
+model Achievement {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String   @default("🏆")
+  category    String   // "learning", "innovation", "collaboration", "global", "special"
+  rarity      String   // "common", "rare", "epic", "legendary"
+  xpReward    Int      @default(0)
+  coinReward  Int      @default(0)
+  gemReward   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  // Relationships
+  userAchievements UserAchievement[]
+  
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id           String   @id @default(cuid())
+  userId       String
+  achievementId String
+  unlockedAt   DateTime @default(now())
+  progress     Float    @default(0) // 0-100 percentage
+  
+  // Relationships
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement  Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// Gamification - Power-ups
+model PowerUp {
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  icon          String   @default("⚡")
+  category      String   // "quiz", "search", "innovation", "general"
+  effectType    String   // "time_bonus", "skip_question", "double_points", "hint", "xp_boost"
+  effectValue   Int      // multiplier or bonus amount
+  duration      Int      // duration in seconds, 0 for instant
+  costCoins     Int      @default(0)
+  costGems      Int      @default(0)
+  maxUsesPerDay Int      @default(3)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  
+  // Relationships
+  userPowerUps UserPowerUp[]
+  
+  @@map("power_ups")
+}
+
+model UserPowerUp {
+  id          String   @id @default(cuid())
+  userId      String
+  powerUpId   String
+  usesToday   Int      @default(0)
+  lastUsedAt  DateTime?
+  isActive    Boolean  @default(true)
+  
+  // Relationships
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  powerUp     PowerUp  @relation(fields: [powerUpId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, powerUpId])
+  @@map("user_power_ups")
+}
+
+// Gamification - Daily Challenges
+model DailyChallenge {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  challengeType String   // "quiz", "search", "innovation", "collaboration"
+  difficulty    String   // "easy", "medium", "hard"
+  targetValue   Int      // number of actions required
+  xpReward      Int      @default(0)
+  coinReward    Int      @default(0)
+  gemReward     Int      @default(0)
+  isActive      Boolean  @default(true)
+  date          DateTime @default(now())
+  
+  // Relationships
+  userChallenges UserDailyChallenge[]
+  
+  @@map("daily_challenges")
+}
+
+model UserDailyChallenge {
+  id             String   @id @default(cuid())
+  userId         String
+  challengeId    String
+  progress       Int      @default(0)
+  isCompleted    Boolean  @default(false)
+  completedAt    DateTime?
+  
+  // Relationships
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge      DailyChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, challengeId])
+  @@map("user_daily_challenges")
+}
+
+// Quiz System
+model Quiz {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String   // "cs", "ai", "un", "general", "innovation"
+  difficulty  String   // "easy", "medium", "hard"
+  timeLimit   Int?     // in seconds
+  isActive    Boolean  @default(true)
+  isGenerated Boolean  @default(false) // AI-generated
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  questions   Question[]
+  attempts    QuizAttempt[]
+  
+  @@map("quizzes")
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  quizId      String
+  question    String
+  type        String   // "multiple_choice", "true_false", "short_answer", "code"
+  options     String   // JSON string for multiple choice options
+  correctAnswer String
+  explanation String?
+  points      Int      @default(1)
+  order       Int      @default(0)
+  
+  // Relationships
+  quiz        Quiz       @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers     QuizAnswer[]
+  
+  @@map("questions")
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  score       Int      @default(0)
+  maxScore    Int      @default(0)
+  timeSpent   Int      // in seconds
+  completedAt DateTime?
+  startedAt   DateTime @default(now())
+  
+  // Relationships
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz        Quiz        @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers     QuizAnswer[]
+  
+  @@map("quiz_attempts")
+}
+
+model QuizAnswer {
+  id          String   @id @default(cuid())
+  attemptId   String
+  questionId  String
+  userAnswer  String
+  isCorrect   Boolean
+  points      Int      @default(0)
+  timeSpent   Int      // in seconds
+  
+  // Relationships
+  attempt     QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question    Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  @@map("quiz_answers")
+}
+
+// Team System
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  avatarUrl   String?
+  leaderId    String
+  maxMembers  Int      @default(10)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relationships
+  leader      User         @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      String   @default("member") // "leader", "admin", "member"
+  joinedAt  DateTime @default(now())
+  
+  // Relationships
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+// Virtual Economy - Inventory
+model InventoryItem {
+  id          String   @id @default(cuid())
+  userId      String
+  itemType    String   // "avatar", "theme", "badge", "effect"
+  itemId      String   // reference to specific item
+  quantity    Int      @default(1)
+  isEquipped  Boolean  @default(false)
+  acquiredAt  DateTime @default(now())
+  
+  // Relationships
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, itemType, itemId])
+  @@map("inventory_items")
+}
+
+// Global Missions
+model GlobalMission {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  missionType String   // "collaborative", "individual", "team"
+  targetValue Int      // global target
+  progress    Int      @default(0)
+  xpReward    Int      @default(0)
+  coinReward  Int      @default(0)
+  gemReward   Int      @default(0)
+  isActive    Boolean  @default(true)
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime @default(now())
+  
+  // Relationships
+  participants GlobalMissionParticipant[]
+  
+  @@map("global_missions")
+}
+
+model GlobalMissionParticipant {
+  id          String   @id @default(cuid())
+  missionId   String
+  userId      String
+  progress    Int      @default(0)
+  contribution Int     @default(0)
+  completedAt DateTime?
+  
+  // Relationships
+  mission     GlobalMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([missionId, userId])
+  @@map("global_mission_participants")
+}
+
+// Story Mode - Learning Paths
+model LearningPath {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String   // "cs", "ai", "un", "innovation"
+  difficulty  String   // "beginner", "intermediate", "advanced"
+  estimatedHours Int    @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  // Relationships
+  modules     LearningModule[]
+  userPaths   UserLearningPath[]
+  
+  @@map("learning_paths")
+}
+
+model LearningModule {
+  id          String   @id @default(cuid())
+  pathId      String
+  title       String
+  description String
+  order       Int      @default(0)
+  isUnlocked  Boolean  @default(false)
+  xpReward    Int      @default(0)
+  
+  // Relationships
+  path        LearningPath      @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  userModules UserLearningModule[]
+  
+  @@map("learning_modules")
+}
+
+model UserLearningPath {
+  id          String   @id @default(cuid())
+  userId      String
+  pathId      String
+  progress    Float    @default(0) // 0-100 percentage
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  
+  // Relationships
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  path        LearningPath   @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  modules     UserLearningModule[]
+  
+  @@unique([userId, pathId])
+  @@map("user_learning_paths")
+}
+
+model UserLearningModule {
+  id          String   @id @default(cuid())
+  userPathId  String
+  moduleId    String
+  progress    Float    @default(0) // 0-100 percentage
+  isCompleted Boolean  @default(false)
+  completedAt DateTime?
+  
+  // Relationships
+  userPath    UserLearningPath @relation(fields: [userPathId], references: [id], onDelete: Cascade)
+  module      LearningModule   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  @@unique([userPathId, moduleId])
+  @@map("user_learning_modules")
+}
+
+// Chatbot System
+model ChatConversation {
+  id            String   @id @default(cuid())
+  userId        String
+  title         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relationships
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages     ChatMessage[]
+  
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id            String   @id @default(cuid())
+  conversationId String
+  role          String   // "user" or "assistant"
+  content       String
+  timestamp     DateTime @default(now())
+  messageId     String   @unique
+  
+  // Relationships
+  conversation  ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  @@map("chat_messages")
+}
+
+// Voice System
+model AudioFile {
+  id            String   @id @default(cuid())
+  userId        String
+  filename      String
+  originalName  String
+  filePath      String
+  fileSize      Int
+  mimeType      String
+  duration      Float?
+  transcription String?
+  language      String   @default("en")
+  createdAt     DateTime @default(now())
+  
+  // Relationships
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("audio_files")
+}
+
+// Research System
+model ResearchItem {
+  id            String   @id @default(cuid())
+  title         String
+  abstract      String
+  authors       String   // JSON array
+  publicationDate DateTime
+  source        String
+  url           String
+  type          String   // "paper", "report", "article", "dataset"
+  category      String
+  tags          String   // JSON array
+  viewCount     Int      @default(0)
+  downloadCount Int      @default(0)
+  rating        Float    @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relationships
+  userActivities UserResearchActivity[]
+  
+  @@map("research_items")
+}
+
+model UserResearchActivity {
+  id            String   @id @default(cuid())
+  userId        String
+  researchId    String
+  isViewed      Boolean  @default(false)
+  isBookmarked  Boolean  @default(false)
+  isDownloaded  Boolean  @default(false)
+  userRating    Float?
+  viewedAt      DateTime?
+  bookmarkedAt  DateTime?
+  downloadedAt  DateTime?
+  
+  // Relationships
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  research     ResearchItem  @relation(fields: [researchId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, researchId])
+  @@map("user_research_activities")
+}
+
+// Leaderboard System
+model LeaderboardEntry {
+  id            String   @id @default(cuid())
+  userId        String
+  leaderboardType String // "global", "weekly", "monthly", "team"
+  rank          Int
+  score         Int
+  periodStart   DateTime
+  periodEnd     DateTime
+  changeInRank  Int?
+  createdAt     DateTime @default(now())
+  
+  // Relationships
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, leaderboardType, periodStart])
+  @@map("leaderboard_entries")
+}
