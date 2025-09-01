@@ -1,10 +1,8 @@
-'use client';
-
 import { ReactNode } from 'react';
 import { dir } from 'i18next';
 import { languages } from '../i18n/settings';
 import { Inter } from 'next/font/google';
-import '../../globals.css';
+import '/globals.css';
 import { I18nProviderClient } from '@/locales/client';
 import Navbar from '@/components/Navbar';
 
