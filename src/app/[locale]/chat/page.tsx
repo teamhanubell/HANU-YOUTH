@@ -7,6 +7,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export const dynamic = 'force-dynamic';
+// Removed dynamic = 'force-dynamic' for static export compatibility
 
-export default ChatPageClient;
+export default function ChatPage({ params }: { params: { locale: string } }) {
+  return <ChatPageClient />;
+}

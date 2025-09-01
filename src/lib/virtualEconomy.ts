@@ -41,6 +41,10 @@ export class VirtualEconomy {
 
   private saveState() {
     try {
+      // Check if we're in a browser environment
+      if (typeof window === 'undefined') {
+        return
+      }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state))
     } catch (error) {
       console.error('Failed to save virtual economy state:', error)
@@ -49,6 +53,11 @@ export class VirtualEconomy {
 
   private loadState(): VirtualEconomyState | null {
     try {
+      // Check if we're in a browser environment
+      if (typeof window === 'undefined') {
+        console.log('Failed to load virtual economy state: localStorage not available')
+        return null
+      }
       const saved = localStorage.getItem(STORAGE_KEY)
       return saved ? JSON.parse(saved) : null
     } catch (error) {

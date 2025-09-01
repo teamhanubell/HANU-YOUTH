@@ -16,4 +16,4 @@ export default function ChatPage() {
   return <ChatComponent />;
 }
 
-export const dynamic = 'force-dynamic';
+// Removed dynamic = 'force-dynamic' for static export compatibility
