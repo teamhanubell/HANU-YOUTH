@@ -1,11 +1,3 @@
-import { languages } from '../../i18n/settings';
-
-export async function generateStaticParams() {
-  return languages.map((lng) => ({
-    locale: lng
-  }));
-}
-
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -17,6 +9,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, X, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+
+import { languages } from '../../i18n/settings';
+
+export async function generateStaticParams() {
+  return languages.map((lng) => ({
+    locale: lng
+  }));
+}
 
 interface Contact {
   id: string;

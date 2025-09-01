@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo } from 'react';
 import { Clock, Award, CheckCircle, AlertTriangle, Search, X } from 'lucide-react';
 import { toast } from 'react-toastify';

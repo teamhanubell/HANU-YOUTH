@@ -1,4 +1,4 @@
-'use client'
+
 
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -204,11 +204,11 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-['Inter',_sans-serif]">
-      <div className="max-w-6xl mx-auto p-4 h-screen flex flex-col">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-0 flex-1 overflow-hidden rounded-lg shadow-sm">
+      <div className="flex flex-col h-screen max-w-6xl p-4 mx-auto">
+        <div className="grid flex-1 grid-cols-1 gap-0 overflow-hidden rounded-lg shadow-sm md:grid-cols-4">
           {/* Contacts List */}
-          <Card className="md:col-span-1 overflow-hidden flex flex-col border-r border-gray-100 rounded-r-none">
-            <CardHeader className="border-b p-4">
+          <Card className="flex flex-col overflow-hidden border-r border-gray-100 rounded-r-none md:col-span-1">
+            <CardHeader className="p-4 border-b">
               <CardTitle className="text-lg font-semibold">Chats</CardTitle>
             </CardHeader>
             <ScrollArea className="flex-1">
@@ -234,28 +234,28 @@ export default function ChatPage() {
                     }}
                   >
                     <div className="relative mr-3">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10 text-primary font-medium text-sm">
+                      <div className="flex items-center justify-center w-10 h-10 text-sm font-medium rounded-full bg-primary/10 text-primary">
                         {contact.avatar}
                       </div>
                       {contact.online && (
-                        <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></span>
+                        <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 border-2 border-white rounded-full"></span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-medium text-sm text-gray-900 truncate">{contact.name}</h3>
-                        <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-medium text-gray-900 truncate">{contact.name}</h3>
+                        <span className="ml-2 text-xs text-gray-400 whitespace-nowrap">
                           {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
                         </span>
                       </div>
                       <div className="flex items-center justify-between mt-0.5">
                         <p className="text-xs text-gray-500 truncate max-w-[140px]">
                           {contact.isTyping 
-                            ? <span className="text-primary font-medium">typing...</span> 
+                            ? <span className="font-medium text-primary">typing...</span> 
                             : messages[contact.id]?.[messages[contact.id]?.length - 1]?.text || 'No messages yet'}
                         </p>
                         {contact.unreadCount > 0 && (
-                          <Badge variant="destructive" className="h-5 w-5 p-0 flex items-center justify-center text-xs ml-2">
+                          <Badge variant="destructive" className="flex items-center justify-center w-5 h-5 p-0 ml-2 text-xs">
                             {contact.unreadCount}
                           </Badge>
                         )}
@@ -268,11 +268,11 @@ export default function ChatPage() {
           </Card>
 
           {/* Chat Area */}
-          <Card className="md:col-span-3 flex flex-col border-l-0 rounded-l-none">
-            <CardHeader className="border-b p-4">
+          <Card className="flex flex-col border-l-0 rounded-l-none md:col-span-3">
+            <CardHeader className="p-4 border-b">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-11 h-11 rounded-full flex items-center justify-center bg-primary/10 text-primary font-medium text-sm">
+                  <div className="flex items-center justify-center text-sm font-medium rounded-full w-11 h-11 bg-primary/10 text-primary">
                     {activeContact.avatar}
                   </div>
                   {activeContact.online && (
@@ -283,7 +283,7 @@ export default function ChatPage() {
                   <div className="flex items-center gap-2">
                     <h2 className="text-base font-semibold text-gray-900 truncate">{activeContact.name}</h2>
                     {activeContact.isTyping && (
-                      <span className="text-xs text-primary font-medium">typing...</span>
+                      <span className="text-xs font-medium text-primary">typing...</span>
                     )}
                   </div>
                   <p className="text-xs text-gray-500 mt-0.5">
@@ -296,7 +296,7 @@ export default function ChatPage() {
             </CardHeader>
 
             {/* Messages */}
-            <div className="flex-1 overflow-hidden flex flex-col bg-gray-50">
+            <div className="flex flex-col flex-1 overflow-hidden bg-gray-50">
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-2">
                   {messages[activeContact.id]?.map((m) => (
@@ -353,13 +353,13 @@ export default function ChatPage() {
             </div>
 
             {/* Message Input */}
-            <div className="p-4 border-t bg-white">
+            <div className="p-4 bg-white border-t">
               {imagePreview && (
-                <div className="mb-3 relative inline-block">
+                <div className="relative inline-block mb-3">
                   <img 
                     src={imagePreview} 
                     alt="Preview" 
-                    className="h-24 w-auto rounded-lg border border-gray-200 object-cover"
+                    className="object-cover w-auto h-24 border border-gray-200 rounded-lg"
                   />
                   <button
                     type="button"
@@ -370,7 +370,7 @@ export default function ChatPage() {
                         fileInputRef.current.value = ''
                       }
                     }}
-                    className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+                    className="absolute p-1 bg-white rounded-full shadow-md -top-2 -right-2 hover:bg-gray-100"
                   >
                     <X className="w-4 h-4 text-gray-600" />
                   </button>
@@ -389,7 +389,7 @@ export default function ChatPage() {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type a message..."
-                    className="h-11 rounded-lg border-gray-200 focus-visible:ring-1 focus-visible:ring-primary/50 pr-12"
+                    className="pr-12 border-gray-200 rounded-lg h-11 focus-visible:ring-1 focus-visible:ring-primary/50"
                   />
                   <input
                     type="file"
@@ -402,7 +402,7 @@ export default function ChatPage() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-500 hover:bg-gray-100"
+                    className="absolute w-8 h-8 text-gray-500 -translate-y-1/2 right-2 top-1/2 hover:bg-gray-100"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -416,7 +416,7 @@ export default function ChatPage() {
                   type="submit" 
                   disabled={!newMessage.trim() && !selectedImage}
                   size="icon"
-                  className="h-11 w-11 rounded-lg bg-primary hover:bg-primary/90 text-white flex-shrink-0"
+                  className="flex-shrink-0 text-white rounded-lg h-11 w-11 bg-primary hover:bg-primary/90"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
