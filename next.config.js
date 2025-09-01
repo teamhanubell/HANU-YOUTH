@@ -24,6 +24,11 @@ const nextConfig = {
   output: 'export',
   trailingSlash: true,
   
+  // Disable API routes for static export
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+  },
+  
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {

@@ -19,7 +19,8 @@
   
   # Prisma configuration
   PRISMA_GENERATE_FLAG = "1"
-  PRISMA_SKIP_POSTINSTALL_GENERATE = "true"
+  PRISMA_SKIP_POSTINSTALL_GENERATE = "false"
+  DATABASE_URL = "file:./dev.db"
 
 # Required for Next.js 13+ with App Router
 [functions]
