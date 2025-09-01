@@ -43,9 +43,9 @@ const nextConfig = {
     return config;
   },
   
-  env: {
-    NEXT_PUBLIC_SITE_URL: process.env.URL || 'https://hanubell.netlify.app',
-  },
+  // env: {
+  //   NEXT_PUBLIC_SITE_URL: process.env.URL || 'https://hanubell.netlify.app',
+  // },
   
   typescript: {
     ignoreBuildErrors: true,
