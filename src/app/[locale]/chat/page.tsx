@@ -1,5 +1,5 @@
 import { languages } from '../../i18n/settings';
-import { ChatClient } from './chat-client';
+import ChatPageClient from './ChatPageClient';
 
 export async function generateStaticParams() {
   return languages.map((lng) => ({
@@ -7,6 +7,6 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function ChatPage() {
-  return <ChatClient />;
-}
+export const dynamic = 'force-dynamic';
+
+export default ChatPageClient;

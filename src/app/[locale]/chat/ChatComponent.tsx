@@ -35,15 +35,15 @@ const MOCK_CONTACTS: Contact[] = [
     id: 'u1', 
     name: 'Vaishnavi', 
     avatar: 'V',
-    online: true, 
+    online: true,
     unreadCount: 2,
     isTyping: false
   },
   { 
     id: 'u2', 
-    name: 'Vishal',
-    avatar: 'V',
-    online: true, 
+    name: 'Siddhant',
+    avatar: 'S',
+    online: true,
     unreadCount: 0,
     isTyping: true
   },
@@ -122,7 +122,8 @@ const ChatClient = () => {
     } catch (error) {
       console.error('Failed to send message:', error);
       // Update message status to show error
-      setMessageStatus('error' as any);
+      // @ts-ignore
+      setMessageStatus('error');
     } finally {
       setIsSending(false);
     }
@@ -161,40 +162,44 @@ const ChatClient = () => {
         </div>
         
         <ScrollArea className="h-[calc(100vh-65px)]">
-          {contacts.map(contact => (
-            <div 
-              key={contact.id}
-              className={cn(
-                'p-4 border-b hover:bg-gray-50 cursor-pointer flex items-center justify-between',
-                selectedContact?.id === contact.id && 'bg-blue-50'
-              )}
-              onClick={() => setSelectedContact(contact)}
-            >
-              <div className="flex items-center space-x-3">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
-                    {contact.avatar}
+          <div className="divide-y">
+            {contacts.map((contact) => (
+              <div 
+                key={contact.id}
+                className={cn(
+                  'p-4 hover:bg-gray-50 cursor-pointer flex items-center justify-between',
+                  selectedContact?.id === contact.id && 'bg-blue-50'
+                )}
+                onClick={() => setSelectedContact(contact)}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
+                      {contact.avatar}
+                    </div>
+                    {contact.online && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                    )}
                   </div>
-                  {contact.online && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                  )}
-                </div>
-                <div>
-                  <div className="font-medium">{contact.name}</div>
-                  <div className="text-sm text-gray-500">
-                    {contact.isTyping 
-                      ? 'typing...' 
-                      : contact.lastSeen || (contact.online ? 'online' : '')}
+                  <div>
+                    <p className="font-medium">{contact.name}</p>
+                    <p className="text-sm text-gray-500">
+                      {contact.isTyping 
+                        ? t('chat.typing')
+                        : contact.lastSeen || ''
+                      }
+                    </p>
                   </div>
                 </div>
+                
+                {contact.unreadCount > 0 && (
+                  <Badge variant="destructive" className="h-5 w-5 flex items-center justify-center p-0">
+                    {contact.unreadCount}
+                  </Badge>
+                )}
               </div>
-              {contact.unreadCount > 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  {contact.unreadCount}
-                </Badge>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </ScrollArea>
       </div>
       
@@ -213,14 +218,18 @@ const ChatClient = () => {
                   )}
                 </div>
                 <div>
-                  <div className="font-medium">{selectedContact.name}</div>
-                  <div className="text-sm text-gray-500">
+                  <p className="font-medium">{selectedContact.name}</p>
+                  <p className="text-sm text-gray-500">
                     {selectedContact.isTyping 
-                      ? 'typing...' 
-                      : selectedContact.online ? 'online' : 'offline'}
-                  </div>
+                      ? t('chat.typing')
+                      : selectedContact.online 
+                        ? t('chat.online')
+                        : t('chat.lastSeen', { time: selectedContact.lastSeen })
+                    }
+                  </p>
                 </div>
               </div>
+              
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -234,6 +243,7 @@ const ChatClient = () => {
             <ScrollArea className="flex-1 p-4 bg-gray-50">
               <div className="space-y-4">
                 {/* messages */}
+                <div ref={messagesEndRef} />
               </div>
             </ScrollArea>
             
@@ -275,9 +285,9 @@ const ChatClient = () => {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 p-6 text-center">
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
             <MessageCircle className="h-12 w-12 text-gray-300 mb-4" />
-            <h3 className="text-xl font-medium text-gray-700 mb-2">
+            <h3 className="text-xl font-medium text-gray-900 mb-2">
               {t('chat.selectContact')}
             </h3>
             <p className="text-gray-500 max-w-md">
@@ -288,7 +298,6 @@ const ChatClient = () => {
       </div>
     </div>
   );
-}
+};
 
-// Export as default
 export default ChatClient;

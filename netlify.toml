@@ -19,62 +19,13 @@
   node_bundler = "esbuild"
   external_node_modules = ["@prisma/client", "prisma"]
   included_files = ["prisma/schema.prisma"]
+  directory = "netlify/functions"
 
+# Install Next.js plugin
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    enableStatic404 = true
-    enableStatic500 = true
-    enableImageOptimization = true
-    enableStaticDataRoutes = true
 
-# Cache optimization
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    
-    # Cache static assets for 1 year
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Handle i18n redirects
-[[redirects]]
-  from = "/"
-  to = "/:lang"
-  status = 301
-  force = false
-  conditions = {Language = ["en", "es", "fr", "hi", "zh"]}
-
-# Handle other routes with locale
-[[redirects]]
-  from = "/*"
-  to = "/:lang/:splat"
-  status = 200
-  force = false
-  conditions = {Language = ["en", "es", "fr", "hi", "zh"]}
-
-# Fallback for non-matching routes
-[[redirects]]
-  from = "/*"
-  to = "/en/:splat"
-  status = 200
-  force = false
-
-[dev]
-  command = "npm run dev"
-  targetPort = 3000
-  port = 3000
-  publish = ".next"
-  framework = "nextjs"
-
-# Prisma build hook
-[[plugins]]
-  package = "netlify-plugin-prisma"
-
-# Security headers for all responses
+# Security headers for all routes
 [[headers]]
   for = "/*"
   [headers.values]
@@ -83,30 +34,9 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    
-    # Cache static assets for 1 year
-    Cache-Control = "public, max-age=31536000, immutable"
-[[redirects]]
-  from = "/"
-  to = "/en"
-  status = 301
-  force = true
-  
-[[redirects]]
-  from = "/:lang(en|es|fr|hi|zh)/*"
-  to = "/:lang/index.html"
-  status = 200
+    Cache-Control = "public, max-age=3600"
 
-# Handle static files
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-Content-Type-Options = "nosniff"
-    X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    
-# Cache static assets
+# Cache static assets with long TTL
 [[headers]]
   for = "/*.js"
   [headers.values]
@@ -122,55 +52,61 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Security headers for API routes
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Disable caching for API routes
 [[headers]]
   for = "/api/*"
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
-  to = "/index.html"
+
+# Handle i18n redirects
+[[redirects]]
+  from = "/"
+  to = "/en"
+  status = 301
+  force = true
+  
+# Handle language-specific routes
+[[redirects]]
+  from = "/:lang(en|es|fr|hi|zh)/*"
+  to = "/:lang/index.html"
   status = 200
 
-# Headers for better security and performance
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
-    Cache-Control = "public, max-age=3600"
+# Fallback for non-matching routes
+[[redirects]]
+  from = "/*"
+  to = "/en/:splat"
+  status = 200
 
-[[headers]]
-  for = "*.js"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+# API not found handler
+[[redirects]]
+  from = "/api/*"
+  to = "/api/not-found"
+  status = 404
+  force = false
 
-[[headers]]
-  for = "*.css"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.jpg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.png"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.svg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "*.ico"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Function configuration for API routes
-[functions]
-  directory = "netlify/functions"
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+  port = 3000
+  publish = ".next"
+  framework = "nextjs"

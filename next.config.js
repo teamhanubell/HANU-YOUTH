@@ -4,6 +4,7 @@ const nextConfig = {
   images: {
     domains: ['localhost', 'res.cloudinary.com', 'lh3.googleusercontent.com', 'avatars.githubusercontent.com'],
   },
+  devIndicators: false,
   // Enable static exports for Netlify
   output: 'standalone',
   // Enable React Strict Mode
