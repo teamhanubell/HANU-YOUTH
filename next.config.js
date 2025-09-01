@@ -1,15 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Basic configuration
   reactStrictMode: true,
   
-  // Image optimization configuration
   images: {
-    unoptimized: true, // Required for static exports
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**', // Allow all external domains
+        hostname: '**',
       },
     ],
     domains: [
@@ -23,13 +21,10 @@ const nextConfig = {
     minimumCacheTTL: 60,
   },
   
-  // Static export configuration
   output: 'export',
   trailingSlash: true,
   
-  // Webpack configuration
   webpack: (config, { isServer }) => {
-    // Fixes npm packages that depend on `net` module
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -40,29 +35,22 @@ const nextConfig = {
         child_process: false,
       };
     }
-    
     return config;
   },
   
-  // Environment variables
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.URL || 'https://hanubell.netlify.app',
   },
   
-  // Disable type checking during build (handled by CI)
   typescript: {
     ignoreBuildErrors: true,
   },
   
-  // Disable ESLint during build (handled by CI)
   eslint: {
     ignoreDuringBuilds: true,
   },
   
-  // Disable server components for static export
-  experimental: {
-    serverActions: false,
-  },
+
 };
 
 module.exports = nextConfig;
