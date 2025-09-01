@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import './globals.css'
 import { ReactNode } from 'react'
-import { ThemeProvider } from '@/components/Theme/ThemeProvider'
-import { ChatConnectionsProvider } from '@/components/Chat/ConnectionsProvider'
+import ClientProviders from '@/components/ClientProviders'
 
 const inter = Inter({
   variable: "--font-inter",
@@ -38,11 +37,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
-        <ThemeProvider>
-          <ChatConnectionsProvider>
-            {children}
-          </ChatConnectionsProvider>
-        </ThemeProvider>
+        <ClientProviders>
+          {children}
+        </ClientProviders>
       </body>
     </html>
   )

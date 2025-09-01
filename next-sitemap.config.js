@@ -12,7 +12,7 @@ module.exports = {
   },
   exclude: ['/server-sitemap.xml', '/admin/*', '/api/*', '/_next/*', '/404', '/500'],
   generateIndexSitemap: true,
-  outDir: 'public',
+  outDir: 'out',
   // i18n configuration
   i18n: {
     locales: ['en', 'es', 'fr', 'hi', 'zh'],

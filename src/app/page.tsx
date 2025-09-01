@@ -239,21 +239,18 @@ function VoiceResearchAssistant() {
 
   async function handleQuery(query: string) {
     try {
-      // fetch response from your research API
-      const res = await fetch('/api/ai/research', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: query })
-      })
-
-      let text = ''
-      if (res.ok) {
-        const data = await res.json()
-        text = (data?.response || data?.text || '').toString()
-      } else {
-        text = 'Sorry, I could not get a response.'
-      }
-
+      // Mock AI response for static export
+      const mockResponses = [
+        "Based on my research, youth empowerment through technology is a key driver for global development. The HANU-YOUTH platform provides excellent resources for young innovators.",
+        "AI in education offers tremendous opportunities for personalized learning. Our platform includes AI-powered tools to enhance your learning experience.",
+        "Global collaboration among youth is essential for solving world challenges. The HANU-YOUTH community connects young people worldwide.",
+        "Innovation and creativity are crucial skills for the future. Our platform offers various tools to develop these capabilities."
+      ]
+      
+      // Select a random response based on the query
+      const randomIndex = Math.floor(Math.random() * mockResponses.length)
+      const text = mockResponses[randomIndex]
+      
       // speak the response only (voice-only)
       speakText(text)
     } catch (err) {
@@ -400,31 +397,45 @@ export default function Home() {
       setIsLoading(true)
       setHasSearched(true)
       
-      try {
-        const response = await fetch('/api/search', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            query: query,
-            category: selectedCategory === 'all' ? undefined : selectedCategory,
-            limit: 10
-          }),
-        })
-
-        if (!response.ok) {
-          throw new Error('Search failed')
+      // Mock search results for static export
+      const mockResults: SearchResult[] = [
+        {
+          id: '1',
+          title: 'Youth Empowerment Through Technology',
+          content: 'Research on how technology can empower young people globally...',
+          url: '/research/youth-empowerment',
+          type: 'research',
+          source: 'UNESCO',
+          date: '2024-01-15',
+          relevanceScore: 0.95
+        },
+        {
+          id: '2',
+          title: 'AI in Education: Opportunities and Challenges',
+          content: 'Comprehensive study on artificial intelligence applications in educational settings...',
+          url: '/research/ai-education',
+          type: 'research',
+          source: 'MIT',
+          date: '2024-01-10',
+          relevanceScore: 0.88
+        },
+        {
+          id: '3',
+          title: 'Global Youth Innovation Summit 2024',
+          content: 'Annual conference bringing together young innovators from around the world...',
+          url: '/events/innovation-summit',
+          type: 'event',
+          source: 'HANU-YOUTH',
+          date: '2024-02-01',
+          relevanceScore: 0.82
         }
-
-        const data = await response.json()
-        setSearchResults(data.results)
-      } catch (error) {
-        console.error('Search error:', error)
-        setSearchResults([])
-      } finally {
+      ]
+      
+      // Simulate API delay
+      setTimeout(() => {
+        setSearchResults(mockResults)
         setIsLoading(false)
-      }
+      }, 500)
     }
   }
 

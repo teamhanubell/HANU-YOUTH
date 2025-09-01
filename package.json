@@ -6,7 +6,6 @@
   "license": "ISC",
   "author": "HanuBell",
   "type": "commonjs",
-  "main": "next-i18next.config.js",
   "directories": {
     "example": "examples"
   },
@@ -16,9 +15,8 @@
     "dev": "cross-env NODE_OPTIONS=--no-warnings=ExperimentalWarning concurrently \"npx next dev\" \"npm:server:watch\"",
     "dev:concurrent": "cross-env NODE_OPTIONS=--no-warnings=ExperimentalWarning concurrently \"npx next dev\" \"cross-env HOST=localhost nodemon --watch server.ts --watch src/lib --watch lib --ext ts,tsx,js,jsx,json --delay 0 --exec 'npx tsx server.ts'\"",
     "build": "next build",
-    "export": "next export",
     "postbuild": "next-sitemap",
-    "build:netlify": "prisma generate && SKIP_ENV_VALIDATION=true npm run build && npx next-sitemap",
+    "build:netlify": "rm -rf out .next && SKIP_ENV_VALIDATION=true npm run build && npx next-sitemap",
     "start": "NODE_ENV=production next start -p $PORT",
     "lint": "next lint",
     "db:push": "prisma db push",
@@ -83,7 +81,6 @@
     "lucide-react": "^0.525.0",
     "next": "^14.2.32",
     "next-auth": "^4.24.11",
-    "next-i18next": "^15.4.2",
     "next-intl": "^4.3.4",
     "next-themes": "^0.4.6",
     "prisma": "^6.15.0",

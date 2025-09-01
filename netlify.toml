@@ -1,7 +1,8 @@
 [build]
   command = "npm run build:netlify"
   publish = "out"
-  functions = ".netlify/functions"
+  # No functions needed for static export
+  # functions = ".netlify/functions"
 
 [build.environment]
   # Node.js version
@@ -22,16 +23,16 @@
   PRISMA_SKIP_POSTINSTALL_GENERATE = "false"
   DATABASE_URL = "file:./dev.db"
 
-# Required for Next.js 13+ with App Router
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["@prisma/client", "prisma"]
-  included_files = ["prisma/schema.prisma"]
-  directory = "netlify/functions"
+# Functions not needed for static export
+# [functions]
+#   node_bundler = "esbuild"
+#   external_node_modules = ["@prisma/client", "prisma"]
+#   included_files = ["prisma/schema.prisma"]
+#   directory = "netlify/functions"
 
-# Install Next.js plugin
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+# Next.js plugin not needed for static export
+# [[plugins]]
+#   package = "@netlify/plugin-nextjs"
 
 # Security headers for all routes
 [[headers]]
@@ -86,23 +87,33 @@
   [headers.values]
     Cache-Control = "no-cache, no-store, must-revalidate"
 
-# Handle i18n redirects
+# Handle root route - serve the main homepage
 [[redirects]]
   from = "/"
-  to = "/en"
-  status = 301
-  force = true
-  
-# Handle language-specific routes
+  to = "/index.html"
+  status = 200
+
+# Handle language-specific routes for static export
 [[redirects]]
-  from = "/:lang(en|es|fr|hi|zh)/*"
+  from = "/:lang(en|es|fr|hi|zh)"
   to = "/:lang/index.html"
   status = 200
 
-# Fallback for non-matching routes
+[[redirects]]
+  from = "/:lang(en|es|fr|hi|zh)/*"
+  to = "/:lang/:splat/index.html"
+  status = 200
+
+# Handle other static routes
+[[redirects]]
+  from = "/:route(ai-assistant|chat|economy|games|gamification|global-awareness|leaderboard|learning-hub|levels|profile|quiz|research|research-hub|streaks|teams)"
+  to = "/:route/index.html"
+  status = 200
+
+# Fallback for non-matching routes - serve the main page
 [[redirects]]
   from = "/*"
-  to = "/en/:splat"
+  to = "/index.html"
   status = 200
 
 # API not found handler

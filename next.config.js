@@ -2,6 +2,18 @@
 const nextConfig = {
   reactStrictMode: true,
   
+  // Static export configuration
+  output: 'export',
+  trailingSlash: true,
+  
+  // Disable server-side features for static export
+  experimental: {
+    missingSuspenseWithCSRBailout: false,
+    // Disable server components for static export
+    serverComponentsExternalPackages: [],
+  },
+  
+  // Images configuration for static export
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -21,14 +33,7 @@ const nextConfig = {
     minimumCacheTTL: 60,
   },
   
-  output: 'export',
-  trailingSlash: true,
-  
-  // Disable API routes for static export
-  experimental: {
-    missingSuspenseWithCSRBailout: false,
-  },
-  
+  // Webpack configuration for static export
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -43,10 +48,7 @@ const nextConfig = {
     return config;
   },
   
-  // env: {
-  //   NEXT_PUBLIC_SITE_URL: process.env.URL || 'https://hanubell.netlify.app',
-  // },
-  
+  // Build configuration
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -55,7 +57,10 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   
-
+  // Generate static pages for all routes
+  generateBuildId: async () => {
+    return 'build'
+  },
 };
 
 module.exports = nextConfig;

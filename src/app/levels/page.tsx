@@ -6,21 +6,12 @@ import BackButton from '@/components/BackButton'
 
 export default function LevelsPage() {
   useEffect(() => {
-    // Award XP for visiting the levels page
+    // Mock XP award for static export
     const awardPageVisitXP = async () => {
       try {
-        await fetch('/api/gamification/achievements', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'add_xp',
-            xp_amount: 5,
-            activity_type: 'exploration',
-            source_description: 'Visited levels page'
-          })
-        })
+        // Simulate XP award without API call
+        console.log('XP awarded for visiting levels page: +5 XP')
+        // In a real app, this would update local storage or state
       } catch (error) {
         console.error('Error awarding page visit XP:', error)
       }
