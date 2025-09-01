@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.URL || 'https://hanubell.netlify.app',
+  siteUrl: process.env.SITE_URL || 'https://hanubell.netlify.app',
   generateRobotsTxt: true,
   robotsTxtOptions: {
     policies: [
