@@ -1,5 +1,5 @@
-import { languages } from '../../i18n/settings';
-import { ChatClient } from './chat-client';
+import { languages } from "../../i18n/settings";
+import { ChatClient } from "./chat-client";
 
 export async function generateStaticParams() {
   return languages.map((lng) => ({

@@ -1,33 +1,91 @@
 [build]
-  command = "npm install && npm run build"
+  command = "npm run build:netlify"
   publish = ".next"
-  functions = ".next/functions"
+  functions = ".netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
   NEXT_TELEMETRY_DISABLED = "1"
   NETLIFY = "true"
   NODE_OPTIONS = "--max_old_space_size=4096"
+  
+  # Prisma
+  PRISMA_GENERATE_FLAG = "1"
+  PRISMA_SKIP_POSTINSTALL_GENERATE = "true"
+
+# Required for Next.js 13+ with App Router
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@prisma/client", "prisma"]
+  included_files = ["prisma/schema.prisma"]
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
   [plugins.inputs]
     enableStatic404 = true
     enableStatic500 = true
+    enableImageOptimization = true
+    enableStaticDataRoutes = true
+
+# Cache optimization
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Cache static assets for 1 year
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Handle i18n redirects
+[[redirects]]
+  from = "/"
+  to = "/:lang"
+  status = 301
+  force = false
+  conditions = {Language = ["en", "es", "fr", "hi", "zh"]}
+
+# Handle other routes with locale
+[[redirects]]
+  from = "/*"
+  to = "/:lang/:splat"
+  status = 200
+  force = false
+  conditions = {Language = ["en", "es", "fr", "hi", "zh"]}
+
+# Fallback for non-matching routes
+[[redirects]]
+  from = "/*"
+  to = "/en/:splat"
+  status = 200
+  force = false
 
 [dev]
   command = "npm run dev"
+  targetPort = 3000
   port = 3000
   publish = ".next"
+  framework = "nextjs"
 
-# Redirects for SPA and i18n
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Prisma build hook
+[[plugins]]
+  package = "netlify-plugin-prisma"
 
-# Handle i18n redirects
+# Security headers for all responses
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    
+    # Cache static assets for 1 year
+    Cache-Control = "public, max-age=31536000, immutable"
 [[redirects]]
   from = "/"
   to = "/en"
